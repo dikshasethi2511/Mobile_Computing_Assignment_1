@@ -1,11 +1,42 @@
-package com.example.navigationapp.ui.theme
-
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val LightOrange = Color(0xFFFFD699)
+val DarkOrange = Color(0xFFFFA343)
+val AccentOrange = Color(0xFFFF5C00)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val LightGray = Color(0xFFE0E0E0)
+val DarkGray = Color(0xFF616161)
+
+val DarkBackground = Color(0xFF121212)
+val LightBackground = Color(0xFFFFFFFF)
+
+val DarkOnBackground = Color(0xFFFFFFFF)
+val LightOnBackground = Color(0xFF000000)
+
+val LightOrangeColorScheme = lightColorScheme(
+    primary = LightOrange,
+    secondary = DarkOrange,
+    tertiary = AccentOrange,
+    background = LightBackground,
+    surface = LightBackground,
+    onPrimary = DarkOnBackground,
+    onSecondary = DarkOnBackground,
+    onTertiary = DarkOnBackground,
+    onBackground = DarkOnBackground,
+    onSurface = DarkOnBackground
+)
+
+val DarkOrangeColorScheme = darkColorScheme(
+    primary = LightOrange,
+    secondary = DarkOrange,
+    tertiary = AccentOrange,
+    background = DarkBackground,
+    surface = DarkBackground,
+    onPrimary = LightOnBackground,
+    onSecondary = LightOnBackground,
+    onTertiary = LightOnBackground,
+    onBackground = LightOnBackground,
+    onSurface = LightOnBackground
+)
