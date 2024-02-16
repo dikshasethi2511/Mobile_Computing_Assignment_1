@@ -128,7 +128,7 @@ fun StopsColumn(
 @Composable
 fun JourneyDetails(
     modifier: Modifier = Modifier, totalDistance: Float,
-    distanceCovered: Float, isMetricUnit: Boolean
+    distanceCovered: Float, isMetricUnit: Boolean,
 ) {
 
     val distanceLeft = totalDistance - distanceCovered
@@ -176,7 +176,8 @@ fun JourneyDetails(
 fun TopButtonsRow(
     modifier: Modifier = Modifier, isMetricUnit: Boolean,
     onUnitSwitchClick: () -> Unit,
-    onReachedStopClick: () -> Unit
+    onReachedStopClick: () -> Unit,
+    onRestartJourney: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -230,7 +231,7 @@ fun TopButtonsRow(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             ElevatedButton(
-                onClick = {},
+                onClick = { onRestartJourney() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp),
@@ -262,22 +263,28 @@ fun MyApp(modifier: Modifier = Modifier) {
         val journeyFinished = remember { mutableStateOf(false) }
         val totalJourneyDistance =
             stopsData.sumOf { stringResource(it.second).toDouble() }.toFloat()
-        val nextDistance : Float = if(!journeyFinished.value){
+        val nextDistance: Float = if (!journeyFinished.value) {
             stringResource(id = stopsData[nextStopIndex.intValue].second).toFloat()
-        } else{
+        } else {
             0f
         }
         TopButtonsRow(modifier = Modifier.weight(1f), isMetricUnit = isMetricUnit.value,
             onUnitSwitchClick = { isMetricUnit.value = !isMetricUnit.value },
             onReachedStopClick = {
                 if (!journeyFinished.value) {
-                    if(nextStopIndex.intValue == stopsData.size - 1){
+                    if (nextStopIndex.intValue == stopsData.size - 1) {
                         journeyFinished.value = true
                     }
                     distanceCovered.floatValue += nextDistance
                     nextStopIndex.intValue++
                 }
             },
+            onRestartJourney = {
+                // Reset journey variables
+                distanceCovered.floatValue = 0.0f
+                nextStopIndex.intValue = 0
+                journeyFinished.value = false
+            }
         )
         StopsColumn(
             modifier = Modifier
@@ -289,6 +296,7 @@ fun MyApp(modifier: Modifier = Modifier) {
         JourneyDetails(
             modifier = Modifier.weight(1f), totalDistance = totalJourneyDistance,
             distanceCovered = distanceCovered.floatValue, isMetricUnit = isMetricUnit.value
+
         )
     }
 }
@@ -343,7 +351,8 @@ fun TopButtonsRowPreview() {
         TopButtonsRow(
             isMetricUnit = true,
             onUnitSwitchClick = {},
-            onReachedStopClick = {}
+            onReachedStopClick = {},
+            onRestartJourney = {}
         )
     }
 }
