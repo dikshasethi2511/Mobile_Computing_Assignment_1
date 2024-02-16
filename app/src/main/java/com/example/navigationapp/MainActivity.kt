@@ -261,10 +261,9 @@ fun MyApp(modifier: Modifier = Modifier) {
         val nextStopIndex = remember { mutableIntStateOf(0) }
         val isMetricUnit = remember { mutableStateOf(true) }
         val journeyFinished = remember { mutableStateOf(false) }
-        val totalJourneyDistance =
-            stopsData.sumOf { stringResource(it.second).toDouble() }.toFloat()
+        val totalJourneyDistance = getTotalDistance()
         val nextDistance: Float = if (!journeyFinished.value) {
-            stringResource(id = stopsData[nextStopIndex.intValue].second).toFloat()
+            fetchNextStopDistance(index = nextStopIndex.intValue).toFloat()
         } else {
             0f
         }
@@ -301,6 +300,22 @@ fun MyApp(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+private fun fetchNextStopDistance(index: Int): String {
+    return stringResource(id = stopsData[index].second)
+}
+
+@Composable
+private fun getTotalDistance(): Float {
+    var totalDistance = 0f
+
+    for ((_, distanceResId) in stopsData) {
+        totalDistance += stringResource(distanceResId).toFloat()
+    }
+
+    return totalDistance
+}
+
 
 private val stopsData = listOf(
     R.string.stop1_name to R.string.stop1_distance,
@@ -313,6 +328,8 @@ private val stopsData = listOf(
     R.string.stop8_name to R.string.stop8_distance,
     R.string.stop9_name to R.string.stop9_distance,
     R.string.stop10_name to R.string.stop10_distance,
+    R.string.stop11_name to R.string.stop11_distance,
+    R.string.stop12_name to R.string.stop12_distance,
 ).map { (nameResId, distanceResId) ->
     nameResId to distanceResId
 }

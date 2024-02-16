@@ -10,6 +10,8 @@
     <string name="stop8_name">Stop 8</string>
     <string name="stop9_name">Stop 9</string>
     <string name="stop10_name">Stop 10</string>
+    <string name="stop11_name">Stop 11</string>
+    <string name="stop12_name">Stop 12</string>
     <string name="stop1_distance">1.2</string>
     <string name="stop2_distance">2.3</string>
     <string name="stop3_distance">3.7</string>
@@ -20,4 +22,6 @@
     <string name="stop8_distance">8.7</string>
     <string name="stop9_distance">9.5</string>
     <string name="stop10_distance">10.3</string>
+    <string name="stop11_distance">11.1</string>
+    <string name="stop12_distance">12.9</string>
 </resources>
