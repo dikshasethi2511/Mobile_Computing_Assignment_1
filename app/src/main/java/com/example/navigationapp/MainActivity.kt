@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,14 +21,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.navigationapp.ui.theme.NavigationAppTheme
-import com.google.android.gms.wallet.button.ButtonConstants
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun StopElement(modifier: Modifier = Modifier, @StringRes name: Int, @StringRes distance: Int) {
+fun StopElement(modifier: Modifier = Modifier, @StringRes name: Int, @StringRes distance: Int, isMetricUnit: Boolean) {
     Surface(
         color = LightOrangeColorScheme.primary,
         modifier = modifier
@@ -63,7 +64,11 @@ fun StopElement(modifier: Modifier = Modifier, @StringRes name: Int, @StringRes 
                 modifier = Modifier.padding(start = 16.dp)
             )
             Text(
-                text = stringResource(distance),
+                text = if (isMetricUnit) {
+                    stringResource(distance) + " km"
+                } else {
+                    convertKmToMiles(stringResource(distance).toFloat()) + " miles"
+                },
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(end = 16.dp)
             )
@@ -71,8 +76,15 @@ fun StopElement(modifier: Modifier = Modifier, @StringRes name: Int, @StringRes 
     }
 }
 
+private fun convertKmToMiles(km: Float): String {
+    // Convert kilometers to miles using the conversion factor.
+    val miles = km * 0.621371
+    // Format the result to two decimal place.
+    return String.format("%.2f", miles)
+}
+
 @Composable
-fun StopsColumn(modifier: Modifier = Modifier) {
+fun StopsColumn(modifier: Modifier = Modifier, isMetricUnit: Boolean) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -83,6 +95,7 @@ fun StopsColumn(modifier: Modifier = Modifier) {
             StopElement(
                 name = nameResId,
                 distance = distanceResId,
+                isMetricUnit = isMetricUnit,
             )
         }
     }
@@ -117,7 +130,10 @@ fun JourneyDetails(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TopButtonsRow(modifier: Modifier = Modifier) {
+fun TopButtonsRow(
+    modifier: Modifier = Modifier, isMetricUnit: Boolean,
+    onUnitSwitchClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .height(120.dp)
@@ -141,12 +157,12 @@ fun TopButtonsRow(modifier: Modifier = Modifier) {
             ) {
                 Text(
                     "Reached Stop",
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
 
             ElevatedButton(
-                onClick = {},
+                onClick = { onUnitSwitchClick() },
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 4.dp),
@@ -156,8 +172,9 @@ fun TopButtonsRow(modifier: Modifier = Modifier) {
                 )
             ) {
                 Text(
-                    "Switch Units",
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    if (isMetricUnit) "Switch to Miles" else "Switch to Km",
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -195,11 +212,14 @@ fun MyApp(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        TopButtonsRow(modifier = Modifier.weight(1f))
+        val isMetricUnit = remember { mutableStateOf(true) }
+        TopButtonsRow(modifier = Modifier.weight(1f), isMetricUnit = isMetricUnit.value,
+            onUnitSwitchClick = { isMetricUnit.value = !isMetricUnit.value })
         StopsColumn(
             modifier = Modifier
                 .weight(2f)
-                .padding(bottom = 8.dp)
+                .padding(bottom = 8.dp),
+            isMetricUnit = isMetricUnit.value,
         )
         JourneyDetails(modifier = Modifier.weight(1f))
     }
@@ -228,7 +248,8 @@ fun StopElementPreview() {
         StopElement(
             name = R.string.stop1_name,
             distance = R.string.stop1_distance,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
+            isMetricUnit = true,
         )
     }
 }
@@ -236,13 +257,18 @@ fun StopElementPreview() {
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun StopsColumnPreview() {
-    NavigationAppTheme { StopsColumn() }
+    NavigationAppTheme { StopsColumn(isMetricUnit = true) }
 }
 
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun TopButtonsRowPreview() {
-    NavigationAppTheme { TopButtonsRow() }
+    NavigationAppTheme {
+        TopButtonsRow(
+            isMetricUnit = true,
+            onUnitSwitchClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true, widthDp = 320)
