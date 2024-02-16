@@ -22,6 +22,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.navigationapp.ui.theme.NavigationAppTheme
+import androidx.compose.ui.graphics.Color
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,9 +47,22 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun StopElement(modifier: Modifier = Modifier, @StringRes name: Int, @StringRes distance: Int, isMetricUnit: Boolean) {
+fun StopElement(
+    modifier: Modifier = Modifier,
+    @StringRes name: Int,
+    @StringRes distance: Int,
+    isMetricUnit: Boolean,
+    isCurrentStop: Boolean,
+    isCovered: Boolean
+) {
+
+    val backgroundColor = when {
+        isCurrentStop -> Color(0xFFFFEB3B)  // Highlight current stop with yellow background.
+        isCovered -> Color(0xFF4CAF50) // Mark covered stops with green background.
+        else -> LightOrangeColorScheme.primary // Default background color.
+    }
     Surface(
-        color = LightOrangeColorScheme.primary,
+        color = backgroundColor,
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
@@ -84,7 +100,10 @@ private fun convertKmToMiles(km: Float): String {
 }
 
 @Composable
-fun StopsColumn(modifier: Modifier = Modifier, isMetricUnit: Boolean) {
+fun StopsColumn(
+    modifier: Modifier = Modifier, isMetricUnit: Boolean, nextStopIndex: Int,
+    distanceCovered: Float
+) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -92,10 +111,14 @@ fun StopsColumn(modifier: Modifier = Modifier, isMetricUnit: Boolean) {
     ) {
         items(stopsData.size) { index ->
             val (nameResId, distanceResId) = stopsData[index]
+            val isCurrentStop = index == nextStopIndex
+            val isCovered = index < nextStopIndex
             StopElement(
                 name = nameResId,
                 distance = distanceResId,
                 isMetricUnit = isMetricUnit,
+                isCurrentStop = isCurrentStop,
+                isCovered = isCovered,
             )
         }
     }
@@ -132,7 +155,8 @@ fun JourneyDetails(modifier: Modifier = Modifier) {
 @Composable
 fun TopButtonsRow(
     modifier: Modifier = Modifier, isMetricUnit: Boolean,
-    onUnitSwitchClick: () -> Unit
+    onUnitSwitchClick: () -> Unit,
+    onReachedStopClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -145,7 +169,7 @@ fun TopButtonsRow(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             ElevatedButton(
-                onClick = {},
+                onClick = { onReachedStopClick() },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 4.dp),
@@ -212,14 +236,23 @@ fun MyApp(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .padding(16.dp),
     ) {
+        val distanceCovered = remember { mutableFloatStateOf(0.0f) }
+        val nextStopIndex = remember { mutableIntStateOf(0) }
         val isMetricUnit = remember { mutableStateOf(true) }
         TopButtonsRow(modifier = Modifier.weight(1f), isMetricUnit = isMetricUnit.value,
-            onUnitSwitchClick = { isMetricUnit.value = !isMetricUnit.value })
+            onUnitSwitchClick = { isMetricUnit.value = !isMetricUnit.value },
+            onReachedStopClick = {
+                distanceCovered.floatValue += stopsData[nextStopIndex.intValue].second.toFloat()
+                nextStopIndex.intValue++
+                
+            }
+        )
         StopsColumn(
             modifier = Modifier
                 .weight(2f)
                 .padding(bottom = 8.dp),
-            isMetricUnit = isMetricUnit.value,
+            isMetricUnit = isMetricUnit.value, nextStopIndex = nextStopIndex.intValue,
+            distanceCovered = distanceCovered.floatValue,
         )
         JourneyDetails(modifier = Modifier.weight(1f))
     }
@@ -250,6 +283,8 @@ fun StopElementPreview() {
             distance = R.string.stop1_distance,
             modifier = Modifier.padding(8.dp),
             isMetricUnit = true,
+            isCurrentStop = true,
+            isCovered = false
         )
     }
 }
@@ -257,7 +292,13 @@ fun StopElementPreview() {
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun StopsColumnPreview() {
-    NavigationAppTheme { StopsColumn(isMetricUnit = true) }
+    NavigationAppTheme {
+        StopsColumn(
+            isMetricUnit = true,
+            nextStopIndex = 1,
+            distanceCovered = 1.3f
+        )
+    }
 }
 
 @Preview(showBackground = true, widthDp = 320)
@@ -266,7 +307,8 @@ fun TopButtonsRowPreview() {
     NavigationAppTheme {
         TopButtonsRow(
             isMetricUnit = true,
-            onUnitSwitchClick = {}
+            onUnitSwitchClick = {},
+            onReachedStopClick = {}
         )
     }
 }
