@@ -126,7 +126,12 @@ fun StopsColumn(
 
 
 @Composable
-fun JourneyDetails(modifier: Modifier = Modifier) {
+fun JourneyDetails(
+    modifier: Modifier = Modifier, totalDistance: Float,
+    distanceCovered: Float, isMetricUnit: Boolean
+) {
+
+    val distanceLeft = totalDistance - distanceCovered
     Column(
         modifier = Modifier
             .height(110.dp)
@@ -135,17 +140,32 @@ fun JourneyDetails(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Text(
-            "Total Distance Covered: 10.5 km",
-            style = MaterialTheme.typography.titleMedium,
-        )
+        if (!isMetricUnit) {
+            val distanceCoveredInMiles = convertKmToMiles(distanceCovered)
+            val distanceLeftInMiles = convertKmToMiles(distanceLeft)
+            Text(
+                "Total Distance Covered: $distanceCoveredInMiles miles",
+                style = MaterialTheme.typography.titleMedium,
+            )
 
-        Text(
-            "Total Distance Left: 10.5 km",
-            style = MaterialTheme.typography.titleMedium,
-        )
+            Text(
+                "Total Distance Left: $distanceLeftInMiles miles",
+                style = MaterialTheme.typography.titleMedium,
+            )
+        } else {
+            Text(
+                "Total Distance Covered: ${distanceCovered.toString()} km",
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            Text(
+                "Total Distance Left: ${distanceLeft.toString()} km",
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+
         LinearProgressIndicator(
-            progress = 0.5f,
+            progress = distanceCovered / totalDistance,
             modifier = Modifier.fillMaxWidth(),
             color = LightOrangeColorScheme.secondary,
         )
@@ -239,13 +259,25 @@ fun MyApp(modifier: Modifier = Modifier) {
         val distanceCovered = remember { mutableFloatStateOf(0.0f) }
         val nextStopIndex = remember { mutableIntStateOf(0) }
         val isMetricUnit = remember { mutableStateOf(true) }
+        val journeyFinished = remember { mutableStateOf(false) }
+        val totalJourneyDistance =
+            stopsData.sumOf { stringResource(it.second).toDouble() }.toFloat()
+        val nextDistance : Float = if(!journeyFinished.value){
+            stringResource(id = stopsData[nextStopIndex.intValue].second).toFloat()
+        } else{
+            0f
+        }
         TopButtonsRow(modifier = Modifier.weight(1f), isMetricUnit = isMetricUnit.value,
             onUnitSwitchClick = { isMetricUnit.value = !isMetricUnit.value },
             onReachedStopClick = {
-                distanceCovered.floatValue += stopsData[nextStopIndex.intValue].second.toFloat()
-                nextStopIndex.intValue++
-                
-            }
+                if (!journeyFinished.value) {
+                    if(nextStopIndex.intValue == stopsData.size - 1){
+                        journeyFinished.value = true
+                    }
+                    distanceCovered.floatValue += nextDistance
+                    nextStopIndex.intValue++
+                }
+            },
         )
         StopsColumn(
             modifier = Modifier
@@ -254,7 +286,10 @@ fun MyApp(modifier: Modifier = Modifier) {
             isMetricUnit = isMetricUnit.value, nextStopIndex = nextStopIndex.intValue,
             distanceCovered = distanceCovered.floatValue,
         )
-        JourneyDetails(modifier = Modifier.weight(1f))
+        JourneyDetails(
+            modifier = Modifier.weight(1f), totalDistance = totalJourneyDistance,
+            distanceCovered = distanceCovered.floatValue, isMetricUnit = isMetricUnit.value
+        )
     }
 }
 
@@ -316,7 +351,13 @@ fun TopButtonsRowPreview() {
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun JourneyDetailsPreview() {
-    NavigationAppTheme { JourneyDetails() }
+    NavigationAppTheme {
+        JourneyDetails(
+            distanceCovered = 4.5f,
+            totalDistance = 10.7f,
+            isMetricUnit = true
+        )
+    }
 }
 
 @Preview(showBackground = true, widthDp = 320)
