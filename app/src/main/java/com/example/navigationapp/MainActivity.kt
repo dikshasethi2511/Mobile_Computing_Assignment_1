@@ -104,22 +104,42 @@ fun StopsColumn(
     modifier: Modifier = Modifier, isMetricUnit: Boolean, nextStopIndex: Int,
     distanceCovered: Float
 ) {
-    LazyColumn(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(vertical = 20.dp),
-    ) {
-        items(stopsData.size) { index ->
-            val (nameResId, distanceResId) = stopsData[index]
-            val isCurrentStop = index == nextStopIndex
-            val isCovered = index < nextStopIndex
-            StopElement(
-                name = nameResId,
-                distance = distanceResId,
-                isMetricUnit = isMetricUnit,
-                isCurrentStop = isCurrentStop,
-                isCovered = isCovered,
-            )
+    if (stopsData.size > 10) {
+        LazyColumn(
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(vertical = 20.dp),
+        ) {
+            items(stopsData.size) { index ->
+                val (nameResId, distanceResId) = stopsData[index]
+                val isCurrentStop = index == nextStopIndex
+                val isCovered = index < nextStopIndex
+                StopElement(
+                    name = nameResId,
+                    distance = distanceResId,
+                    isMetricUnit = isMetricUnit,
+                    isCurrentStop = isCurrentStop,
+                    isCovered = isCovered,
+                )
+            }
+        }
+
+    } else {
+        Column(
+            modifier = modifier.padding(vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            stopsData.forEachIndexed { index, (nameResId, distanceResId) ->
+                val isCurrentStop = index == nextStopIndex
+                val isCovered = index < nextStopIndex
+                StopElement(
+                    name = nameResId,
+                    distance = distanceResId,
+                    isMetricUnit = isMetricUnit,
+                    isCurrentStop = isCurrentStop,
+                    isCovered = isCovered,
+                )
+            }
         }
     }
 }
@@ -333,6 +353,20 @@ private val stopsData = listOf(
 ).map { (nameResId, distanceResId) ->
     nameResId to distanceResId
 }
+
+//private val stopsData = listOf(
+//    R.string.stop1_name to R.string.stop1_distance,
+//    R.string.stop2_name to R.string.stop2_distance,
+//    R.string.stop3_name to R.string.stop3_distance,
+//    R.string.stop4_name to R.string.stop4_distance,
+//    R.string.stop5_name to R.string.stop5_distance,
+//    R.string.stop6_name to R.string.stop6_distance,
+//    R.string.stop7_name to R.string.stop7_distance,
+//    R.string.stop8_name to R.string.stop8_distance,
+//    R.string.stop9_name to R.string.stop9_distance,
+//).map { (nameResId, distanceResId) ->
+//    nameResId to distanceResId
+//}
 
 @Preview(showBackground = true)
 @Composable

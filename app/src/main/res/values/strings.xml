@@ -14,14 +14,14 @@
     <string name="stop12_name">Stop 12</string>
     <string name="stop1_distance">1.2</string>
     <string name="stop2_distance">2.3</string>
-    <string name="stop3_distance">3.7</string>
-    <string name="stop4_distance">4.5</string>
-    <string name="stop5_distance">5.3</string>
-    <string name="stop6_distance">6.1</string>
-    <string name="stop7_distance">7.9</string>
-    <string name="stop8_distance">8.7</string>
-    <string name="stop9_distance">9.5</string>
-    <string name="stop10_distance">10.3</string>
-    <string name="stop11_distance">11.1</string>
-    <string name="stop12_distance">12.9</string>
+    <string name="stop3_distance">2.4</string>
+    <string name="stop4_distance">4.1</string>
+    <string name="stop5_distance">3.1</string>
+    <string name="stop6_distance">2.1</string>
+    <string name="stop7_distance">3.7</string>
+    <string name="stop8_distance">4.6</string>
+    <string name="stop9_distance">7.8</string>
+    <string name="stop10_distance">1.1</string>
+    <string name="stop11_distance">4.3</string>
+    <string name="stop12_distance">5.5</string>
 </resources>
