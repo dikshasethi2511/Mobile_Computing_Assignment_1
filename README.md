@@ -28,6 +28,15 @@ The Navigation App is an Android application designed to provide users with a se
   - Mark reaching a stop.
   - Switch between metric and imperial units.
   - Restart the journey.
+ 
+## A Peek into the App
+
+<div style="display: flex; justify-content: space-between;">
+  <img src="images/screenshot1.png" alt="Screenshot 1" style="width: 33%; height: auto; margin-right: 20px;">
+  <img src="images/screenshot2.png" alt="Screenshot 2" style="width: 32%; height: auto; margin-right: 60px; margin-left: 60px;">
+  <img src="images/screenshot3.png" alt="Screenshot 3" style="width: 32%; height: auto; margin-left: 20px;">
+</div>
+
 
 ## Implementation Details - Composable Functions
 
